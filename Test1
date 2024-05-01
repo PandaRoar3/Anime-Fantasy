@@ -2,16 +2,20 @@
 local gui = Instance.new("Frame")
 gui.Size = UDim2.new(0, 200, 0, 100)
 gui.Position = UDim2.new(0.5, -100, 0.5, -50)
-gui.BackgroundColor3 = Color3.new(1, 1, 1)
+gui.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2) -- สีพื้นหลังเป็นสีเทาเข้ม
+gui.BorderSizePixel = 2
+gui.BorderColor3 = Color3.new(1, 1, 1) -- สีเส้นขอบเป็นสีขาว
 gui.Parent = game.Players.LocalPlayer.PlayerGui
 
--- สร้างตัวแปรสำหรับการเก็บตำแหน่งของ GUI เมื่อถูกลากหรือย้าย
-local dragging = false
-local offset = Vector2.new()
-
--- เรียกใช้ UserInputService
-local userInputService = game:GetService("UserInputService")
-
+-- ปุ่มสำหรับเปิด/ปิด auto upgrade
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(1, 0, 0.5, 0)
+toggleButton.Position = UDim2.new(0, 0, 0, 0)
+toggleButton.BackgroundColor3 = Color3.new(0.4, 0.4, 0.4) -- สีพื้นหลังเป็นสีเทา
+toggleButton.TextColor3 = Color3.new(1, 1, 1) -- สีข้อความเป็นสีขาว
+toggleButton.Text = "Auto Upgrade: ON"
+toggleButton.FontSize = Enum.FontSize.Size14
+toggleButton.Parent = gui
 -- ฟังก์ชันสำหรับเริ่มการลาก GUI
 local function startDrag(input)
     dragging = true
@@ -51,24 +55,32 @@ gui.InputEnded:Connect(function(input)
     end
 end)
 
--- สร้าง auto upgrade
-local upgradesFolder = game.Players.LocalPlayer.PlayerGui
+-- ตัวแปรเก็บสถานะของ auto upgrade
+local isAutoUpgradeEnabled = true
 
-local function autoUpgrade(model)
+-- ฟังก์ชันสำหรับเปิด/ปิด auto upgrade
+local function toggleAutoUpgrade()
+    isAutoUpgradeEnabled = not isAutoUpgradeEnabled
     if isAutoUpgradeEnabled then
-        local args = {
-            [1] = model
-        }
-        game:GetService("ReplicatedStorage").Remotes.Upgrades:FireServer(unpack(args))
+        toggleButton.Text = "Auto Upgrade: ON"
+    else
+        toggleButton.Text = "Auto Upgrade: OFF"
+    end
+end
+
+-- ตรวจสอบการคลิกปุ่มสำหรับเปิด/ปิด auto upgrade
+toggleButton.MouseButton1Click:Connect(toggleAutoUpgrade)
+
+-- ฟังก์ชันสำหรับ auto upgrade
+local function autoUpgrade()
+    if isAutoUpgradeEnabled then
+        -- วางโค้ด auto upgrade ที่นี่
+        print("Performing auto upgrade...")
     end
 end
 
 -- ตรวจสอบและอัพเกรดทุก 1 วินาที
 while true do
-    for _, model in ipairs(upgradesFolder:GetChildren()) do
-        if model:IsA("Model") then
-            autoUpgrade(model)
-        end
-    end
+    autoUpgrade()
     wait(1)
 end
