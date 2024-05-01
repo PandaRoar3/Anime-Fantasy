@@ -1,21 +1,36 @@
--- สร้าง GUI
-local gui = Instance.new("Frame")
-gui.Size = UDim2.new(0, 200, 0, 100)
-gui.Position = UDim2.new(0.5, -100, 0.5, -50)
-gui.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2) -- สีพื้นหลังเป็นสีเทาเข้ม
-gui.BorderSizePixel = 2
-gui.BorderColor3 = Color3.new(1, 1, 1) -- สีเส้นขอบเป็นสีขาว
-gui.Parent = game.Players.LocalPlayer.PlayerGui
+-- สร้าง ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer.PlayerGui
 
--- ปุ่มสำหรับเปิด/ปิด auto upgrade
+-- สร้าง Frame สำหรับ GUI
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 50) -- ขนาดของ Frame
+frame.Position = UDim2.new(0, 10, 0, 10) -- ตำแหน่งของ Frame
+frame.BackgroundColor3 = Color3.new(0, 0, 0) -- สีพื้นหลังของ Frame
+frame.Parent = screenGui
+
+-- สร้างปุ่มเพื่อเปิด/ปิด Auto Upgrade
 local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(1, 0, 0.5, 0)
-toggleButton.Position = UDim2.new(0, 0, 0, 0)
-toggleButton.BackgroundColor3 = Color3.new(0.4, 0.4, 0.4) -- สีพื้นหลังเป็นสีเทา
-toggleButton.TextColor3 = Color3.new(1, 1, 1) -- สีข้อความเป็นสีขาว
-toggleButton.Text = "Auto Upgrade: ON"
-toggleButton.FontSize = Enum.FontSize.Size14
-toggleButton.Parent = gui
+toggleButton.Size = UDim2.new(0, 180, 0, 40) -- ขนาดของปุ่ม
+toggleButton.Position = UDim2.new(0.5, -90, 0.5, -20) -- ตำแหน่งของปุ่ม
+toggleButton.BackgroundColor3 = Color3.new(1, 1, 1) -- สีพื้นหลังของปุ่ม
+toggleButton.TextColor3 = Color3.new(0, 0, 0) -- สีข้อความ
+toggleButton.TextSize = 20 -- ขนาดข้อความ
+toggleButton.Text = "Auto Upgrade: ON" -- ข้อความบนปุ่ม
+toggleButton.Parent = frame
+
+-- สร้างตัวแปรสำหรับเก็บสถานะของ Auto Upgrade
+local isAutoUpgradeEnabled = true
+
+-- ฟังก์ชันสำหรับเปิด/ปิด Auto Upgrade
+local function toggleAutoUpgrade()
+    isAutoUpgradeEnabled = not isAutoUpgradeEnabled
+    if isAutoUpgradeEnabled then
+        toggleButton.Text = "Auto Upgrade: ON"
+    else
+        toggleButton.Text = "Auto Upgrade: OFF"
+    end
+end
 -- ฟังก์ชันสำหรับเริ่มการลาก GUI
 local function startDrag(input)
     dragging = true
@@ -55,32 +70,25 @@ gui.InputEnded:Connect(function(input)
     end
 end)
 
--- ตัวแปรเก็บสถานะของ auto upgrade
-local isAutoUpgradeEnabled = true
-
--- ฟังก์ชันสำหรับเปิด/ปิด auto upgrade
-local function toggleAutoUpgrade()
-    isAutoUpgradeEnabled = not isAutoUpgradeEnabled
-    if isAutoUpgradeEnabled then
-        toggleButton.Text = "Auto Upgrade: ON"
-    else
-        toggleButton.Text = "Auto Upgrade: OFF"
-    end
-end
-
--- ตรวจสอบการคลิกปุ่มสำหรับเปิด/ปิด auto upgrade
+-- กำหนดให้ toggleAutoUpgrade() ถูกเรียกเมื่อคลิกปุ่ม
 toggleButton.MouseButton1Click:Connect(toggleAutoUpgrade)
 
--- ฟังก์ชันสำหรับ auto upgrade
-local function autoUpgrade()
+-- สร้างฟังก์ชันสำหรับ Auto Upgrade
+local function autoUpgrade(model)
     if isAutoUpgradeEnabled then
-        -- วางโค้ด auto upgrade ที่นี่
-        print("Performing auto upgrade...")
+        local args = {
+            [1] = model
+        }
+        game:GetService("ReplicatedStorage").Remotes.Upgrades:FireServer(unpack(args))
     end
 end
 
 -- ตรวจสอบและอัพเกรดทุก 1 วินาที
 while true do
-    autoUpgrade()
+    for _, model in ipairs(upgradesFolder:GetChildren()) do
+        if model:IsA("Model") then
+            autoUpgrade(model)
+        end
+    end
     wait(1)
 end
