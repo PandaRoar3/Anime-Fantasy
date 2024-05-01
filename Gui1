@@ -1,0 +1,32 @@
+-- สร้าง ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer.PlayerGui
+
+-- สร้าง Frame สำหรับปุ่ม
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 50) -- ขนาดของ Frame
+frame.Position = UDim2.new(0.5, -150, 0.5, -25) -- ตำแหน่งของ Frame
+frame.AnchorPoint = Vector2.new(0.5, 0.5) -- จุดยึดกลาง
+frame.BackgroundTransparency = 1 -- ทำให้ Frame โปร่งใส
+frame.Parent = screenGui
+
+-- สร้างตัวแปรสำหรับรายชื่อ unit
+local unitNames = {"unit1", "unit2", "unit3", "unit4", "unit5", "unit6"}
+
+-- สร้างปุ่มสำหรับแต่ละ unit
+local buttonWidth = 50 -- ความกว้างของปุ่ม
+local buttonGap = 10 -- ระยะห่างระหว่างปุ่ม
+local totalWidth = (#unitNames * buttonWidth) + ((#unitNames - 1) * buttonGap) -- ความกว้างทั้งหมดของปุ่มและระยะห่างระหว่างปุ่ม
+
+for i, unitName in ipairs(unitNames) do
+    local button = Instance.new("TextButton")
+    button.Name = unitName
+    button.Size = UDim2.new(0, buttonWidth, 0, 50) -- ขนาดของปุ่ม
+    button.Position = UDim2.new((i - 1) * (buttonWidth + buttonGap) / totalWidth, 0, 0, 0) -- ตำแหน่งของปุ่ม (เริ่มจากซ้าย)
+    button.AnchorPoint = Vector2.new(0, 0.5) -- จุดยึดที่ซ้าย
+    button.BackgroundColor3 = Color3.new(1, 1, 1) -- สีพื้นหลังของปุ่ม
+    button.TextColor3 = Color3.new(0, 0, 0) -- สีข้อความ
+    button.TextSize = 20 -- ขนาดข้อความ
+    button.Text = unitName -- ข้อความบนปุ่ม
+    button.Parent = frame
+end
