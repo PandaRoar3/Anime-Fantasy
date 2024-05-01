@@ -1,0 +1,56 @@
+-- สร้าง ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer.PlayerGui
+
+-- สร้าง Frame สำหรับ GUI
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 50) -- ขนาดของ Frame
+frame.Position = UDim2.new(0, 10, 0, 10) -- ตำแหน่งของ Frame
+frame.BackgroundColor3 = Color3.new(0, 0, 0) -- สีพื้นหลังของ Frame
+frame.Parent = screenGui
+
+-- สร้างปุ่มเพื่อเปิด/ปิด Auto Upgrade
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 180, 0, 40) -- ขนาดของปุ่ม
+toggleButton.Position = UDim2.new(0.5, -90, 0.5, -20) -- ตำแหน่งของปุ่ม
+toggleButton.BackgroundColor3 = Color3.new(1, 1, 1) -- สีพื้นหลังของปุ่ม
+toggleButton.TextColor3 = Color3.new(0, 0, 0) -- สีข้อความ
+toggleButton.TextSize = 20 -- ขนาดข้อความ
+toggleButton.Text = "Auto Upgrade: ON" -- ข้อความบนปุ่ม
+toggleButton.Parent = frame
+
+-- สร้างตัวแปรสำหรับเก็บสถานะของ Auto Upgrade
+local isAutoUpgradeEnabled = true
+
+-- ฟังก์ชันสำหรับเปิด/ปิด Auto Upgrade
+local function toggleAutoUpgrade()
+    isAutoUpgradeEnabled = not isAutoUpgradeEnabled
+    if isAutoUpgradeEnabled then
+        toggleButton.Text = "Auto Upgrade: ON"
+    else
+        toggleButton.Text = "Auto Upgrade: OFF"
+    end
+end
+
+-- กำหนดให้ toggleAutoUpgrade() ถูกเรียกเมื่อคลิกปุ่ม
+toggleButton.MouseButton1Click:Connect(toggleAutoUpgrade)
+
+-- สร้างฟังก์ชันสำหรับ Auto Upgrade
+local function autoUpgrade(model)
+    if isAutoUpgradeEnabled then
+        local args = {
+            [1] = model
+        }
+        game:GetService("ReplicatedStorage").Remotes.Upgrades:FireServer(unpack(args))
+    end
+end
+
+-- ตรวจสอบและอัพเกรดทุก 1 วินาที
+while true do
+    for _, model in ipairs(upgradesFolder:GetChildren()) do
+        if model:IsA("Model") then
+            autoUpgrade(model)
+        end
+    end
+    wait(1)
+end
