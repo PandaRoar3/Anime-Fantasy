@@ -78,16 +78,15 @@ end)
 toggleButton.MouseButton1Click:Connect(toggleAutoUpgrade)
 
 -- สร้างฟังก์ชันสำหรับ Auto Upgrade
+local upgradesFolder = workspace.Unit.hunterx0021
+
 local function autoUpgrade(model)
-    if isAutoUpgradeEnabled then
-        local args = {
-            [1] = model
-        }
-        game:GetService("ReplicatedStorage").Remotes.Upgrades:FireServer(unpack(args))
-    end
+    local args = {
+        [1] = model
+    }
+    game:GetService("ReplicatedStorage").Remotes.Upgrades:FireServer(unpack(args))
 end
 
--- ตรวจสอบและอัพเกรดทุก 1 วินาที
 while true do
     for _, model in ipairs(upgradesFolder:GetChildren()) do
         if model:IsA("Model") then
