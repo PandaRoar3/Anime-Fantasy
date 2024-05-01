@@ -1,0 +1,74 @@
+-- สร้าง GUI
+local gui = Instance.new("Frame")
+gui.Size = UDim2.new(0, 200, 0, 100)
+gui.Position = UDim2.new(0.5, -100, 0.5, -50)
+gui.BackgroundColor3 = Color3.new(1, 1, 1)
+gui.Parent = game.Players.LocalPlayer.PlayerGui
+
+-- สร้างตัวแปรสำหรับการเก็บตำแหน่งของ GUI เมื่อถูกลากหรือย้าย
+local dragging = false
+local offset = Vector2.new()
+
+-- เรียกใช้ UserInputService
+local userInputService = game:GetService("UserInputService")
+
+-- ฟังก์ชันสำหรับเริ่มการลาก GUI
+local function startDrag(input)
+    dragging = true
+    offset = input.Position - gui.Position
+end
+
+-- ฟังก์ชันสำหรับสิ้นสุดการลาก GUI
+local function stopDrag()
+    dragging = false
+end
+
+-- ฟังก์ชันสำหรับอัปเดตตำแหน่งของ GUI เมื่อถูกลาก
+local function updateDrag(input)
+    if dragging then
+        gui.Position = UDim2.new(0, input.Position.X - offset.X, 0, input.Position.Y - offset.Y)
+    end
+end
+
+-- ตรวจสอบการแตะหรือลาก GUI elements
+gui.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        startDrag(input)
+    end
+end)
+
+-- ตรวจสอบการย้าย
+gui.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
+        updateDrag(input)
+    end
+end)
+
+-- ตรวจสอบการปล่อยหรือยกเลิกการลาก
+gui.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        stopDrag()
+    end
+end)
+
+-- สร้าง auto upgrade
+local upgradesFolder = game.Players.LocalPlayer.PlayerGui
+
+local function autoUpgrade(model)
+    if isAutoUpgradeEnabled then
+        local args = {
+            [1] = model
+        }
+        game:GetService("ReplicatedStorage").Remotes.Upgrades:FireServer(unpack(args))
+    end
+end
+
+-- ตรวจสอบและอัพเกรดทุก 1 วินาที
+while true do
+    for _, model in ipairs(upgradesFolder:GetChildren()) do
+        if model:IsA("Model") then
+            autoUpgrade(model)
+        end
+    end
+    wait(1)
+end
