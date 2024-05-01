@@ -31,10 +31,14 @@ local function toggleAutoUpgrade()
         toggleButton.Text = "Auto Upgrade: OFF"
     end
 end
+
 -- ฟังก์ชันสำหรับเริ่มการลาก GUI
+local dragging = false
+local offset = nil
+
 local function startDrag(input)
     dragging = true
-    offset = input.Position - gui.Position
+    offset = input.Position - frame.Position
 end
 
 -- ฟังก์ชันสำหรับสิ้นสุดการลาก GUI
@@ -45,26 +49,26 @@ end
 -- ฟังก์ชันสำหรับอัปเดตตำแหน่งของ GUI เมื่อถูกลาก
 local function updateDrag(input)
     if dragging then
-        gui.Position = UDim2.new(0, input.Position.X - offset.X, 0, input.Position.Y - offset.Y)
+        frame.Position = UDim2.new(0, input.Position.X - offset.X, 0, input.Position.Y - offset.Y)
     end
 end
 
 -- ตรวจสอบการแตะหรือลาก GUI elements
-gui.InputBegan:Connect(function(input)
+frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
         startDrag(input)
     end
 end)
 
 -- ตรวจสอบการย้าย
-gui.InputChanged:Connect(function(input)
+frame.InputChanged:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
         updateDrag(input)
     end
 end)
 
 -- ตรวจสอบการปล่อยหรือยกเลิกการลาก
-gui.InputEnded:Connect(function(input)
+frame.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
         stopDrag()
     end
